@@ -1,15 +1,19 @@
-use crate::Event::WithClosure;
-
 // Event with closure
 enum Event<F> where F: Fn(usize), {
     Simple,
     WithClosure(Option<F>)
 }
 
-struct Struct1 {
+struct Struct1<U> where U: Fn(usize) {
+    recall: U,
 }
 
-impl Struct1 {
+impl<U> Struct1<U> where U: Fn(usize) {
+
+    pub fn new(recall: U) -> Self {
+        Struct1{recall}
+    }
+
     pub fn run<F>(&self, event: Event<F>) where F: Fn(usize) {
         match event {
             Event::Simple => {
@@ -23,12 +27,8 @@ impl Struct1 {
         }
     }
 
-    pub fn dummy(&self, num: usize) {
-        println!("Struct1: {}", num);
-    }
-
     pub fn test(&self, s2: &Struct2) {
-        s2.run(Event::WithClosure(Some(|e| {self.dummy(3)})));
+        s2.run(Event::WithClosure(Some(|e| {(self.recall)(3)})));
     }
 }
 
@@ -57,7 +57,7 @@ impl Struct2 {
 
 
 fn main() {
-    let struct1 = Struct1{};
+    let struct1 = Struct1::new(|event| {println!("Event = {}", event)});
     let struct2 = Struct2{};
     struct1.test(&struct2);
     println!("Hello, world!");
