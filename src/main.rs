@@ -3,7 +3,7 @@ use crate::Event::WithClosure;
 // Event with closure
 enum Event<F> where F: Fn(usize), {
     Simple,
-    WithClosure(F)
+    WithClosure(Option<F>)
 }
 
 struct Struct1 {
@@ -16,7 +16,9 @@ impl Struct1 {
                 println!("Simple");
             },
             Event::WithClosure(closure) => {
-                closure(1);
+                if let Some(cl) = closure {
+                    cl(1);
+                }
             }
         }
     }
@@ -26,7 +28,7 @@ impl Struct1 {
     }
 
     pub fn test(&self, s2: &Struct2) {
-        s2.run(Event::WithClosure(|e| {self.dummy(3)}));
+        s2.run(Event::WithClosure(Some(|e| {self.dummy(3)})));
     }
 }
 
@@ -40,7 +42,9 @@ impl Struct2 {
                 println!("Simple");
             },
             Event::WithClosure(closure) => {
-                closure(2);
+                if let Some(cl) = closure {
+                    cl(2);
+                }
             }
         }
     }
