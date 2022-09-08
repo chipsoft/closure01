@@ -52,9 +52,21 @@ impl Struct2 {
 }
 
 
+struct A<F: Fn(usize)> {
+    s: Struct1<F>,
+}
+
+impl<F: Fn(usize)> A<F> {
+    pub fn new(recall: F) -> Self{
+        A{s: Struct1::new(recall)}
+    }
+}
+
+
 fn main() {
     let struct1 = Struct1::new(|event| {println!("Event = {}", event)});
     let struct2 = Struct2{};
+    let a = A::new(|event| {println!("Event = {}", event)});
     struct1.test(&struct2);
     println!("Hello, world!");
 }
