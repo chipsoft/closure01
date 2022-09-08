@@ -49,10 +49,6 @@ impl Struct2 {
         }
     }
 
-    pub fn dummy(num: usize) {
-        println!("Struct2: {}", num);
-    }
-
 }
 
 
