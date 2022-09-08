@@ -1,5 +1,5 @@
 // Event with closure
-enum Event<F> where F: Fn(usize), {
+enum Event<F> where F: Fn(), {
     Simple,
     WithClosure(Option<F>)
 }
@@ -14,21 +14,21 @@ impl<U> Struct1<U> where U: Fn(usize) {
         Struct1{recall}
     }
 
-    pub fn run<F>(&self, event: Event<F>) where F: Fn(usize) {
+    pub fn run<F>(&self, event: Event<F>) where F: Fn() {
         match event {
             Event::Simple => {
                 println!("Simple");
             },
             Event::WithClosure(closure) => {
                 if let Some(cl) = closure {
-                    cl(1);
+                    cl();
                 }
             }
         }
     }
 
     pub fn test(&self, s2: &Struct2) {
-        s2.run(Event::WithClosure(Some(|e| {(self.recall)(3)})));
+        s2.run(Event::WithClosure(Some(|| {(self.recall)(3)})));
     }
 }
 
@@ -36,14 +36,14 @@ struct Struct2 {
 }
 
 impl Struct2 {
-    pub fn run<F>(&self, event: Event<F>) where F: Fn(usize) {
+    pub fn run<F>(&self, event: Event<F>) where F: Fn() {
         match event {
             Event::Simple => {
                 println!("Simple");
             },
             Event::WithClosure(closure) => {
                 if let Some(cl) = closure {
-                    cl(2);
+                    cl();
                 }
             }
         }
