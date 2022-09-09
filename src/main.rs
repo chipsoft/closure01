@@ -64,15 +64,26 @@ impl<S, U> SM<S, U> where U: Fn(usize) {
     }
 }
 
-impl<UartState, U> SM<UartState, U> where U: Fn(usize) {
-    pub fn print_uart(&self) {
-        println!("UartState");
-    }
+// impl<UartState, U> SM<UartState, U> where U: Fn(usize) {
+//     pub fn print_uart(&self) {
+//         println!("UartState");
+//     }
+// }
+
+// impl<LedState, U> SM<LedState, U> where U: Fn(usize) {
+//     pub fn print_led(&self) {
+//         println!("LedState");
+//     }
+// }
+
+
+struct LedSM<S, F: Fn(usize)> {
+    sm: SM<S, F>,
 }
 
-impl<LedState, U> SM<LedState, U> where U: Fn(usize) {
-    pub fn print_led(&self) {
-        println!("LedState");
+impl<S, F: Fn(usize)> LedSM<S, F> {
+    pub fn new(recall: F) -> Self{
+        LedSM{sm: SM::new(recall)}
     }
 }
 
@@ -97,17 +108,22 @@ impl Struct2 {
 
 
 fn main() {
-    let led_red: SM<LedState, _> = SM::new(|event| {println!("Event = {}", event)});
-    let uart_0: SM<UartState, _> = SM::new(|event| {println!("Event = {}", event)});
+    // let led_red: SM<LedState, _> = SM::new(|event| {println!("Event = {}", event)});
+    // let uart_0: SM<UartState, _> = SM::new(|event| {println!("Event = {}", event)});
 
-    // let a = led_red;
-    
-    led_red.print_uart();
-
-    let struct1: SM<LedState, _> = SM::new(|event| {println!("Event = {}", event)})
-        .set_state(LedState::Off)
-        .set_callback_complete(Some(||{}));
+    // let struct1: SM<LedState, _> = SM::new(|event| {println!("Event = {}", event)})
+    //     .set_state(LedState::Off)
+    //     .set_callback_complete(Some(||{}));
     let struct2 = Struct2{};
-    struct1.test(&struct2);
-    println!("Hello, world!");
+    // struct1.test(&struct2);
+    // println!("Hello, world!");
+
+    let led_red:LedSM<LedState, _> = LedSM { sm: LedSM::new(|event| {println!("Event red = {}", event)})
+    .sm.set_state(LedState::Off).set_callback_complete(Some(||{})) };
+
+    let led_green:LedSM<LedState, _> = LedSM { sm: LedSM::new(|event| {println!("Event green = {}", event)})
+         .sm.set_state(LedState::Off).set_callback_complete(Some(||{})) };
+
+    led_red.sm.test(&struct2);
+    led_green.sm.test(&struct2);
 }
